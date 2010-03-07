@@ -131,28 +131,31 @@ module Erector
       @block.call(self) if @block
     end
 
-    # Emits a (nested) widget onto the current widget's output stream. Accepts
-    # either a class or an instance. If the first argument is a class, then
-    # the second argument is a hash used to populate its instance variables.
-    # If the first argument is an instance then the hash must be unspecified
-    # (or empty). If a block is passed to this method, then it gets set as the
-    # rendered widget's block.
+    # Emits a (nested) widget onto the current widget's output stream.
     #
     # This is the preferred way to call one widget from inside another. This
     # method assures that the same output string is used, which gives better
     # performance than using +capture+ or +to_s+.
+    #
+    # @overload widget(klass, assigns, &block)
+    #   @param [Class] klass Class to instanciate from
+    #   @param [Hash] assigns assigns to populate the class
+    #   @param [Proc] block set as the rendered widget's block
+    # @overload widget(instance, content_method, &block)
+    #   @param [Erector::Widget] instance instance to render
+    #   @param [Symbol] content_method (:content) method to call
+    #   @param [Proc] block set as the rendered widget's block
+    #
     def widget(target, parameters={}, &block)
       child = if target.is_a? Class
         target.new(parameters, &block)
       else
-        unless parameters.empty?
-          raise "Unexpected second parameter. Did you mean to pass in variables when you instantiated the #{target.class.to_s}?"
-        end
+        content_method_name = parameters.empty? ? nil : parameters
         target.block = block unless block.nil?
         target
       end
       output.widgets << child.class
-      child.write_via(self)
+      child.write_via(self, content_method_name)
     end
 
     # Returns text which will *not* be HTML-escaped.
@@ -207,9 +210,13 @@ module Erector
       send(content_method, &blk)
     end
 
-    def write_via(parent)
+    def write_via(parent, content_method_name=nil)
       context(parent, parent.output, parent.helpers) do
-        _call_content
+        unless content_method_name
+          _call_content
+        else
+          send(content_method_name)
+        end
       end
     end
 
