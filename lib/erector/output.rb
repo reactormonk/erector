@@ -30,7 +30,7 @@ module Erector
     end
     
     def to_s
-      @buffer.to_s
+      @buffer.join
     end
     
     def to_a
@@ -56,4 +56,8 @@ module Erector
       @indentation -= 1
     end
   end
+end
+
+class String
+  alias join to_s
 end

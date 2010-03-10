@@ -121,7 +121,7 @@ module WidgetSpec
         end
       end
       
-      class Orphan < Erector::Widget
+      class ::Orphan < Erector::Widget
         def content
           p @name
         end
@@ -131,7 +131,7 @@ module WidgetSpec
         it "renders it" do
           Erector.inline do
             div do
-              widget Orphan, :name => "Annie"
+              widget ::Orphan, :name => "Annie"
             end
           end.to_s.should == "<div><p>Annie</p></div>"
         end
@@ -141,7 +141,7 @@ module WidgetSpec
         it "renders it" do
           Erector.inline do
             div do
-              widget Orphan.new(:name => "Oliver")
+              widget ::Orphan.new(:name => "Oliver")
             end
           end.to_s.should == "<div><p>Oliver</p></div>"
         end
@@ -278,7 +278,7 @@ module WidgetSpec
     end
 
     describe '#write_via' do
-      class A < Erector::Widget
+      class ::A < Erector::Widget
         def content
           p "A"
         end
@@ -288,7 +288,7 @@ module WidgetSpec
         class B < Erector::Widget
           def content
             text "B"
-            A.new.write_via(self)
+            ::A.new.write_via(self)
             text "B"
           end
         end
@@ -299,7 +299,7 @@ module WidgetSpec
       it "passing a widget to text method renders it" do
         Erector.inline do
           text "B"
-          text A.new()
+          text ::A.new()
           text "B"
         end.to_s.should == "B<p>A</p>B"
       end

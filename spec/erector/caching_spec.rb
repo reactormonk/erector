@@ -98,7 +98,7 @@ describe Erector::Caching do
       Family.new.to_s.should == "JOHNNY CACHED<p>June Cash</p>"
     end
 
-    class WidgetWithBlock < Erector::Widget
+    class ::WidgetWithBlock < Erector::Widget
       def content
         call_block
       end
@@ -106,12 +106,12 @@ describe Erector::Caching do
 
     it "doesn't cache widgets initialized with a block (yet)" do
       erector {
-        w = WidgetWithBlock.new do
+        w = ::WidgetWithBlock.new do
           text "in block"
         end
         widget w
       }.should == "in block"
-      @cache[WidgetWithBlock].should be_nil
+      @cache[::WidgetWithBlock].should be_nil
     end
 
   end

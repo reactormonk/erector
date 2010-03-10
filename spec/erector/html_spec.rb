@@ -105,7 +105,7 @@ describe Erector::HTML do
 
     context "with object other than hash" do
       it "returns element with inner text == object.to_s" do
-        object = ['a', 'b']
+        object = 42 # ['a', 'b'] does not work since 1.9 goes like '["a", "b"]' and erector escapes that as well
         Erector.inline do
           element 'div', object
         end.to_s.should == "<div>#{object.to_s}</div>"
@@ -221,9 +221,9 @@ describe Erector::HTML do
       it "calls to_s and quotes" do
         Erector.inline do
           element 'a' do
-            text [7, "foo&bar"]
+            text(:answer => 42)
           end
-        end.to_s.should == "<a>7foo&amp;bar</a>"
+        end.to_s.should == "<a>{:answer=&gt;42}</a>"
       end
     end
   end
@@ -390,7 +390,7 @@ describe Erector::HTML do
         Erector.inline do
           text character([])
         end.to_s
-      }.should raise_error("Unrecognized argument to character: ")
+      }.should raise_error(/Unrecognized argument to character: /)
     end
   end
 
