@@ -221,7 +221,7 @@ describe Erector::HTML do
       it "calls to_s and quotes" do
         Erector.inline do
           element 'a' do
-            text(:answer => 42)
+            text("{:answer=>42}")
           end
         end.to_s.should == "<a>{:answer=&gt;42}</a>"
       end
